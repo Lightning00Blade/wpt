@@ -18,11 +18,12 @@ from webdriver.bidi.modules.script import ContextTarget
 async def add_preload_script(bidi_session):
     preload_scripts_ids = []
 
-    async def add_preload_script(function_declaration, arguments=None, sandbox=None):
+    async def add_preload_script(function_declaration, arguments=None, contexts=None, sandbox=None):
         script = await bidi_session.script.add_preload_script(
             function_declaration=function_declaration,
             arguments=arguments,
             sandbox=sandbox,
+            contexts=contexts,
         )
         preload_scripts_ids.append(script)
 
@@ -214,8 +215,10 @@ def assert_pdf_dimensions(render_pdf_to_png_bidi):
         width, height = png_dimensions(png)
 
         # account for potential rounding errors
-        assert (height - 1) <= cm_to_px(expected_dimensions["height"]) <= (height + 1)
-        assert (width - 1) <= cm_to_px(expected_dimensions["width"]) <= (width + 1)
+        assert (
+            height - 1) <= cm_to_px(expected_dimensions["height"]) <= (height + 1)
+        assert (
+            width - 1) <= cm_to_px(expected_dimensions["width"]) <= (width + 1)
 
     return assert_pdf_dimensions
 
@@ -277,7 +280,8 @@ def compare_png_bidi(bidi_session, url):
         )
         await bidi_session.browsing_context.close(context=context["context"])
         assert result["type"] == "object"
-        assert set(item[0] for item in result["value"]) == {"totalPixels", "maxDifference"}
+        assert set(item[0] for item in result["value"]) == {
+            "totalPixels", "maxDifference"}
         for item in result["value"]:
             assert len(item) == 2
             assert item[1]["type"] == "number"
